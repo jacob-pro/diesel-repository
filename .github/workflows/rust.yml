@@ -19,4 +19,4 @@ jobs:
         run: cargo fmt -- --check
 
       - name: Cargo Sort Check
-        run: cargo install cargo-sort && cargo-sort --check
+        run: cargo install cargo-sort --debug && cargo-sort --check --workspace

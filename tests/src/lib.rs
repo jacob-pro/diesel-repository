@@ -52,7 +52,9 @@ mod test {
         repository.update(&item).unwrap();
         let item = repository.find_by_id(item.id).unwrap().unwrap();
         assert_eq!(item.field2, false);
-        assert_eq!(repository.delete_by_id(item.id).unwrap(), 1);
-        assert_eq!(repository.delete(item).unwrap(), 0);
+        assert_eq!(repository.count().unwrap(), 1);
+        assert_eq!(repository.delete_by_id(item.id).unwrap(), true);
+        assert_eq!(repository.delete(item).unwrap(), false);
+        assert_eq!(repository.count().unwrap(), 0);
     }
 }

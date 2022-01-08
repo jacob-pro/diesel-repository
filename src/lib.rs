@@ -14,14 +14,27 @@ where
     type Conn: Connection;
 
     fn connection(&self) -> &Self::Conn;
+
+    /// Delete an entity, returns bool if it was deleted, false if it did not exist.
     fn delete(&self, entity: Entity) -> QueryResult<bool>;
+
+    /// Delete an entity by id, returns bool if it was deleted, false if it did not exist.
     fn delete_by_id(&self, id: Id) -> QueryResult<bool>;
+
+    /// Find an entity by id, returns Option::None if not found.
     fn find_by_id(&self, id: Id) -> QueryResult<Option<Entity>>;
+
+    /// Fetches all entities in the table.
     fn find_all(&self) -> QueryResult<Vec<Entity>>;
-    fn update(&self, entity: &Entity) -> QueryResult<usize>;
+
+    /// Updates an entity. Returns true if the entity was changed.
+    fn update(&self, entity: &Entity) -> QueryResult<bool>;
+
+    /// Counts all entities in the table
     fn count(&self) -> QueryResult<u64>;
 
-    /// Insert and return the row (only supported on some databases)
+    /// Insert and return the created entity (only supported on some databases)\
+    /// `N` must implement `Insertable`
     fn insert<N>(&self, new_entity: N) -> QueryResult<Entity>
     where
         N: Insertable<Tab<Entity>>,
@@ -33,8 +46,9 @@ where
             .get_result(self.connection())
     }
 
-    /// Insert without returning the row
-    fn insert_only<N>(&self, new_entity: N) -> QueryResult<usize>
+    /// Insert without returning the row\
+    /// `N` must implement `Insertable`
+    fn insert_only<N>(&self, new_entity: N) -> QueryResult<()>
     where
         N: diesel::Insertable<Tab<Entity>>,
         Tab<Entity>: Insertable<Tab<Entity>>,
@@ -46,10 +60,17 @@ where
         diesel::insert_into(Entity::table())
             .values(new_entity)
             .execute(self.connection())
+            .map(|_| ())
     }
 }
 
 #[macro_export]
+/// Generates a structure that implements `CrudRepository<Entity, Key>`
+/// # Arguments
+/// * `name` - The name of the structure to generate
+/// * `entity` - The Entity type (must implement `Queryable`, `Identifiable`, `AsChangeset`)
+/// * `key` - The Key type
+/// * `conn` - The connection type (must implement `diesel::Connection`)
 macro_rules! implement_crud_repository {
     ( $name:ident, $entity:ty, $key:ty, $conn:ty ) => {
         pub struct $name<'l>(&'l $conn);
@@ -99,11 +120,15 @@ macro_rules! implement_crud_repository {
                 use diesel::prelude::*;
                 <$entity>::table().load(self.connection())
             }
-            fn update(&self, entity: &$entity) -> diesel::QueryResult<usize> {
+            fn update(&self, entity: &$entity) -> diesel::QueryResult<bool> {
                 use diesel::prelude::*;
                 diesel::update(entity)
                     .set(entity)
                     .execute(self.connection())
+                    .map(|affected| {
+                        assert!(affected <= 1);
+                        affected > 0
+                    })
             }
             fn count(&self) -> diesel::QueryResult<u64> {
                 use diesel::associations::HasTable;

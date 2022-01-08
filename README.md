@@ -1,6 +1,6 @@
 # Diesel Repository
 
 [![Build status](https://github.com/jacob-pro/diesel-repository/actions/workflows/rust.yml/badge.svg)](https://github.com/jacob-pro/diesel-repository/actions)
-[![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
+![maintenance-status](https://img.shields.io/badge/maintenance-experimental-blue.svg)
 
-An experimental attempt at using the repository pattern with Diesel
+An experimental attempt at using the repository pattern with Diesel.

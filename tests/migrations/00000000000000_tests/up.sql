@@ -1,0 +1,6 @@
+CREATE TABLE tests
+(
+    id INTEGER PRIMARY KEY,
+    field1 TEXT NOT NULL,
+    field2 BOOLEAN NOT NULL
+);

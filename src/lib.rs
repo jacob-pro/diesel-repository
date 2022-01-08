@@ -107,8 +107,8 @@ macro_rules! implement_crud_repository {
             }
             fn count(&self) -> diesel::QueryResult<u64> {
                 use diesel::associations::HasTable;
-                use std::convert::TryFrom;
                 use diesel::prelude::*;
+                use std::convert::TryFrom;
                 <$entity>::table()
                     .count()
                     .first(self.connection())

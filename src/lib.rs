@@ -37,6 +37,7 @@ where
     /// `N` must implement `Insertable`
     fn insert<N>(&self, new_entity: N) -> QueryResult<Entity>
     where
+        Self: Sized,
         N: Insertable<Tab<Entity>>,
         InsertStatement<Tab<Entity>, <N as Insertable<Tab<Entity>>>::Values>:
             RunQueryDsl<Self::Conn> + LoadQuery<Self::Conn, Entity>,
@@ -50,6 +51,7 @@ where
     /// `N` must implement `Insertable`
     fn insert_only<N>(&self, new_entity: N) -> QueryResult<()>
     where
+        Self: Sized,
         N: diesel::Insertable<Tab<Entity>>,
         Tab<Entity>: Insertable<Tab<Entity>>,
         <N as diesel::Insertable<Tab<Entity>>>::Values: diesel::insertable::CanInsertInSingleQuery<Backend<Self::Conn>>

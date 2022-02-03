@@ -56,5 +56,6 @@ mod test {
         assert_eq!(repository.delete_by_id(item.id).unwrap(), true);
         assert_eq!(repository.delete(item).unwrap(), false);
         assert_eq!(repository.count().unwrap(), 0);
+        let _: Box<dyn CrudRepository<Test, i32, Conn = SqliteConnection>> = Box::new(repository);
     }
 }
